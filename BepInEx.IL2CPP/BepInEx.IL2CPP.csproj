@@ -15,20 +15,13 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AssemblyUnhollower">
-      <HintPath>..\lib\AssemblyUnhollower.exe</HintPath>
-    </Reference>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="Il2CppDumper">
       <HintPath>..\lib\Il2CppDumper.dll</HintPath>
     </Reference>
     <Reference Include="Il2Cppmscorlib">
       <HintPath>..\lib\Il2Cppmscorlib.dll</HintPath>
       <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="UnhollowerBaseLib">
-      <HintPath>..\lib\UnhollowerBaseLib.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="UnityEngine-IL2CPP">
       <HintPath>..\lib\UnityEngine-IL2CPP.dll</HintPath>
@@ -41,6 +34,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Il2CppAssemblyUnhollower\AssemblyUnhollower\AssemblyUnhollower.csproj" />
+    <ProjectReference Include="..\..\Il2CppAssemblyUnhollower\UnhollowerBaseLib\UnhollowerBaseLib.csproj" />
+    <ProjectReference Include="..\..\Il2CppAssemblyUnhollower\UnhollowerRuntimeLib\UnhollowerRuntimeLib.csproj" />
+    <ProjectReference Include="..\..\Reactor\Reactor.OxygenFilter\Reactor.OxygenFilter.csproj" />
     <ProjectReference Include="..\BepInEx.Core\BepInEx.Core.csproj" />
     <ProjectReference Include="..\BepInEx.Preloader.Core\BepInEx.Preloader.Core.csproj" />
   </ItemGroup>
