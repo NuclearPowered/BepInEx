@@ -22,10 +22,6 @@ jobs:
 
       - name: Cake Action
         uses: cake-build/cake-action@v1.2.0
-        with:
-          arguments: |
-            bleeding_edge: true
-            build_id: $GITHUB_RUN_NUMBER
 
       - uses: actions/upload-artifact@v2
         with:

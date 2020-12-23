@@ -5,8 +5,8 @@
 #addin nuget:?package=Newtonsoft.Json&version=12.0.3
 
 var target = Argument("target", "Pack");
-var isBleedingEdge = Argument("bleeding_edge", false);
-var buildId = Argument("build_id", 0);
+var buildId = Argument("build_id", EnvironmentVariable("GITHUB_RUN_NUMBER", 0));
+var isBleedingEdge = Argument("bleeding_edge", buildId != 0);
 var lastBuildCommit = Argument("last_build_commit", "");
 
 var buildVersion = "";
