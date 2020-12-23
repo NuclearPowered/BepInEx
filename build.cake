@@ -126,6 +126,7 @@ Task("DownloadDependencies")
     var monoPath = Directory("./bin/doorstop/mono");
     var monoX64Path = doorstopPath + File("mono_x64.zip");
     var monoX86Path = doorstopPath + File("mono_x86.zip");
+    var baseLibs = doorstopPath + File("2019.4.9.zip");
     CreateDirectory(monoPath);
 
     DownloadFile($"https://github.com/BepInEx/mono/releases/download/{MONO_VER}/mono-x64.zip", monoX64Path);
@@ -135,7 +136,6 @@ Task("DownloadDependencies")
 
     ZipUncompress(monoX64Path, monoPath + Directory("x64"));
     ZipUncompress(monoX86Path, monoPath + Directory("x86"));
-    ZipUncompress(bcl, monoPath);
 
     DownloadFile("http://raw.githubusercontent.com/HerpDerpinstine/MelonLoader/master/BaseLibs/UnityDependencies/2019.4.9.zip", baseLibs);
     ZipUncompress(baseLibs, doorstopPath + Directory("BaseLibs"));
