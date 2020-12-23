@@ -22,3 +22,8 @@ jobs:
 
       - name: Cake Action
         uses: cake-build/cake-action@v1.2.0
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: BepInEx-reactor
+          path: bin/dist/UnityIL2CPP_x86
