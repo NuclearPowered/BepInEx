@@ -107,7 +107,7 @@ namespace BepInEx
 			{
 				Name = assembly.GetName().Name;
 
-				var nameAttribute = (AssemblyTitleAttribute)assembly.GetCustomAttribute(typeof(AssemblyTitleAttribute));
+				var nameAttribute = MetadataHelper.GetAttributes<AssemblyTitleAttribute>(assembly).Single();
 				if (nameAttribute != null)
 				{
 					Name = nameAttribute.Title;
@@ -119,7 +119,7 @@ namespace BepInEx
 				var version = assembly.GetName().Version;
 				Version = new SemVer.Version(version.Major, version.Minor, version.Build != -1 ? version.Build : 0);
 
-				var versionAttribute = (AssemblyInformationalVersionAttribute)assembly.GetCustomAttribute(typeof(AssemblyInformationalVersionAttribute));
+				var versionAttribute = MetadataHelper.GetAttributes<AssemblyInformationalVersionAttribute>(assembly).Single();
 				if (versionAttribute != null)
 				{
 					if (SemVer.Version.TryParse(versionAttribute.InformationalVersion, out var v))
