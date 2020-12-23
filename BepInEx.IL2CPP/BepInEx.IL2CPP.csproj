@@ -34,9 +34,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Il2CppAssemblyUnhollower\AssemblyUnhollower\AssemblyUnhollower.csproj" />
-    <ProjectReference Include="..\..\Il2CppAssemblyUnhollower\UnhollowerBaseLib\UnhollowerBaseLib.csproj" />
-    <ProjectReference Include="..\..\Il2CppAssemblyUnhollower\UnhollowerRuntimeLib\UnhollowerRuntimeLib.csproj" />
+    <ProjectReference Include="..\Il2CppAssemblyUnhollower\AssemblyUnhollower\AssemblyUnhollower.csproj" />
+    <ProjectReference Include="..\Il2CppAssemblyUnhollower\UnhollowerBaseLib\UnhollowerBaseLib.csproj" />
+    <ProjectReference Include="..\Il2CppAssemblyUnhollower\UnhollowerRuntimeLib\UnhollowerRuntimeLib.csproj" />
     <ProjectReference Include="..\..\Reactor\Reactor.OxygenFilter\Reactor.OxygenFilter.csproj" />
     <ProjectReference Include="..\BepInEx.Core\BepInEx.Core.csproj" />
     <ProjectReference Include="..\BepInEx.Preloader.Core\BepInEx.Preloader.Core.csproj" />
