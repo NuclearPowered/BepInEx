@@ -1,6 +1,7 @@
 [submodule "Il2CppAssemblyUnhollower"]
 	path = Il2CppAssemblyUnhollower
 	url = https://github.com/NuclearPowered/Il2CppAssemblyUnhollower
+	branch = reactor
 
 [submodule "Reactor"]
 	path = Reactor
