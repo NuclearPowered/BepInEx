@@ -1,3 +1,7 @@
 [submodule "Il2CppAssemblyUnhollower"]
 	path = Il2CppAssemblyUnhollower
 	url = https://github.com/NuclearPowered/Il2CppAssemblyUnhollower
+
+[submodule "Reactor"]
+	path = Reactor
+	url = https://github.com/NuclearPowered/Reactor
