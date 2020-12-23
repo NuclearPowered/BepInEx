@@ -24,8 +24,8 @@ jobs:
         uses: cake-build/cake-action@v1.2.0
         with:
           arguments: |
-            isBleedingEdge: true
-            buildId: $GITHUB_RUN_NUMBER
+            bleeding_edge: true
+            build_id: $GITHUB_RUN_NUMBER
 
       - uses: actions/upload-artifact@v2
         with:

@@ -205,7 +205,7 @@ Task("MakeDist")
         CopyFiles("./bin/" + Directory(originDir) + "/*.*", Directory(bepinDir) + Directory("core"));
 
 
-        FileWriteText(distArchDir + File("changelog.txt"), changelog);
+//         FileWriteText(distArchDir + File("changelog.txt"), changelog);
 
         if (platform == "NetLauncher")
         {
