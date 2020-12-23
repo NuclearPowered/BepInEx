@@ -43,7 +43,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Markdown", "Markdown", "{68
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "BepInEx.Shared", "BepInEx.Shared\BepInEx.Shared.shproj", "{5C7847FB-C16D-47BD-BB17-1045669F9AA7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reactor.OxygenFilter", "..\Reactor\Reactor.OxygenFilter\Reactor.OxygenFilter.csproj", "{65E4D749-1250-4010-B13B-72099CA5F1A7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reactor.OxygenFilter", ".\Reactor\Reactor.OxygenFilter\Reactor.OxygenFilter.csproj", "{65E4D749-1250-4010-B13B-72099CA5F1A7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblyUnhollower", ".\Il2CppAssemblyUnhollower\AssemblyUnhollower\AssemblyUnhollower.csproj", "{3420BFB4-F45D-4181-B02A-521ECC0857CC}"
 EndProject

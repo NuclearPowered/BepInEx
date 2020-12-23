@@ -126,13 +126,10 @@ Task("DownloadDependencies")
     var monoPath = Directory("./bin/doorstop/mono");
     var monoX64Path = doorstopPath + File("mono_x64.zip");
     var monoX86Path = doorstopPath + File("mono_x86.zip");
-    var bcl = doorstopPath + File("FullBCL.zip");
-    var baseLibs = doorstopPath + File("2019.4.9.zip");
     CreateDirectory(monoPath);
 
     DownloadFile($"https://github.com/BepInEx/mono/releases/download/{MONO_VER}/mono-x64.zip", monoX64Path);
     DownloadFile($"https://github.com/BepInEx/mono/releases/download/{MONO_VER}/mono-x86.zip", monoX86Path);
-    DownloadFile($"https://github.com/BepInEx/mono/releases/download/{MONO_VER}/FullBCL.zip", bcl);
 
     Information("Extracting Mono");
 
@@ -201,14 +198,6 @@ Task("MakeDist")
             if (copyMono)
             {
                 CopyDirectory("./bin/doorstop/mono/" + arch + "/mono", Directory(distArchDir) + Directory("mono"));
-
-                var bcl = "./bin/doorstop/mono/FullBCL/";
-                CopyFiles(new[] {
-                    bcl + File("System.Numerics.dll"),
-                    bcl + File("System.Runtime.Serialization.dll"),
-                    bcl + File("System.Data.dll"),
-                }, Directory(distArchDir) + Directory("mono") + Directory("Managed"));
-
                 CopyDirectory("./bin/doorstop/BaseLibs", Directory(distArchDir) + Directory("BepInEx") + Directory("unhollowed") + Directory("base"));
             }
         }
