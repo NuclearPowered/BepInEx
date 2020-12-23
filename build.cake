@@ -4,7 +4,7 @@
 #addin nuget:?package=Cake.Json&version=5.2.0
 #addin nuget:?package=Newtonsoft.Json&version=12.0.3
 
-var target = Argument("target", "MakeDist");
+var target = Argument("target", "Pack");
 var isBleedingEdge = Argument("bleeding_edge", false);
 var buildId = Argument("build_id", 0);
 var lastBuildCommit = Argument("last_build_commit", "");
