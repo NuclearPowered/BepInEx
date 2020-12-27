@@ -4,9 +4,9 @@
 #addin nuget:?package=Cake.Json&version=5.2.0
 #addin nuget:?package=Newtonsoft.Json&version=12.0.3
 
-var target = Argument("target", "Build");
-var isBleedingEdge = Argument("bleeding_edge", false);
-var buildId = Argument("build_id", 0);
+var target = Argument("target", "Pack");
+var buildId = Argument("build_id", EnvironmentVariable("GITHUB_RUN_NUMBER", 0));
+var isBleedingEdge = Argument("bleeding_edge", buildId != 0);
 var lastBuildCommit = Argument("last_build_commit", "");
 
 var buildVersion = "";
@@ -53,7 +53,7 @@ Task("Build")
 {
     var bepinExProperties = Directory("./BepInEx.Shared");
 
-    buildVersion = FindRegexMatchGroupInFile(bepinExProperties + File("BepInEx.Shared.projitems"), @"\<Version\>([0-9]+\.[0-9]+\.[0-9]+)\<\/Version\>", 1, System.Text.RegularExpressions.RegexOptions.None).Value;
+    buildVersion = FindRegexMatchGroupInFile(bepinExProperties + File("BepInEx.Shared.projitems"), @"\<Version\>([0-9]+\.[0-9]+\.[0-9]+)-reactor\<\/Version\>", 1, System.Text.RegularExpressions.RegexOptions.None).Value;
 
     var buildSettings = new MSBuildSettings {
         Configuration = "Release",
@@ -72,9 +72,13 @@ Task("Build")
 
         buildSettings.Properties["AssemblyVersion"] = new[] { buildVersion + "." + buildId };
 
-        buildVersion += "-be." + buildId;
+        buildVersion += "-reactor." + buildId;
 
         buildSettings.Properties["Version"] = new[] { buildVersion };
+    } 
+    else 
+    {
+        buildVersion += "-reactor";
     }
 
     //buildSettings.Properties["TargetFrameworks"] = new []{ "net35" };
@@ -122,6 +126,7 @@ Task("DownloadDependencies")
     var monoPath = Directory("./bin/doorstop/mono");
     var monoX64Path = doorstopPath + File("mono_x64.zip");
     var monoX86Path = doorstopPath + File("mono_x86.zip");
+    var baseLibs = doorstopPath + File("2019.4.9.zip");
     CreateDirectory(monoPath);
 
     DownloadFile($"https://github.com/BepInEx/mono/releases/download/{MONO_VER}/mono-x64.zip", monoX64Path);
@@ -131,6 +136,9 @@ Task("DownloadDependencies")
 
     ZipUncompress(monoX64Path, monoPath + Directory("x64"));
     ZipUncompress(monoX86Path, monoPath + Directory("x86"));
+
+    DownloadFile("http://raw.githubusercontent.com/HerpDerpinstine/MelonLoader/master/BaseLibs/UnityDependencies/2019.4.9.zip", baseLibs);
+    ZipUncompress(baseLibs, doorstopPath + Directory("BaseLibs"));
 });
 
 Task("MakeDist")
@@ -190,13 +198,14 @@ Task("MakeDist")
             if (copyMono)
             {
                 CopyDirectory("./bin/doorstop/mono/" + arch + "/mono", Directory(distArchDir) + Directory("mono"));
+                CopyDirectory("./bin/doorstop/BaseLibs", Directory(distArchDir) + Directory("BepInEx") + Directory("unhollowed") + Directory("base"));
             }
         }
 
         CopyFiles("./bin/" + Directory(originDir) + "/*.*", Directory(bepinDir) + Directory("core"));
 
 
-        FileWriteText(distArchDir + File("changelog.txt"), changelog);
+//         FileWriteText(distArchDir + File("changelog.txt"), changelog);
 
         if (platform == "NetLauncher")
         {

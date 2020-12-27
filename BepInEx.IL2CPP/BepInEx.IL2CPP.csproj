@@ -28,10 +28,6 @@
       <HintPath>..\lib\Il2Cppmscorlib.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="UnhollowerBaseLib">
-      <HintPath>..\lib\UnhollowerBaseLib.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="UnityEngine-IL2CPP">
       <HintPath>..\lib\UnityEngine-IL2CPP.dll</HintPath>
       <Private>False</Private>
@@ -41,6 +37,8 @@
       <Private>False</Private>
       <Aliases>il2cpp</Aliases>
     </Reference>
+    <PackageReference Include="js6pak.Il2CppDumper" Version="6.4.20" />
+    <PackageReference Include="NuclearPowered.AssemblyUnhollower" Version="0.4.12" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BepInEx.Core\BepInEx.Core.csproj" />
@@ -49,7 +47,7 @@
   <ItemGroup>
     <PackageReference Include="BepInEx.Il2Cpp.TlsAdapter" Version="1.0.1" />
     <PackageReference Include="HarmonyX" Version="2.3.1" />
-    <PackageReference Include="Iced" Version="1.6.0" />
+    <PackageReference Include="Iced" Version="1.10.0" />
     <PackageReference Include="MonoMod.RuntimeDetour" Version="20.11.26.2" />
   </ItemGroup>
   <Import Project="..\BepInEx.Shared\BepInEx.Shared.projitems" Label="Shared" />

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using BepInEx.Bootstrap;
 using Mono.Cecil;
+using MonoMod.Utils;
 
 namespace BepInEx
 {
@@ -33,14 +34,14 @@ namespace BepInEx
 		/// </summary>
 		public SemVer.Version Version { get; protected set; }
 
-		/// <param name="GUID">The unique identifier of the plugin. Should not change between plugin versions.</param>
-		/// <param name="Name">The user friendly name of the plugin. Is able to be changed between versions.</param>
-		/// <param name="Version">The specific version of the plugin.</param>
-		public BepInPlugin(string GUID, string Name, string Version)
+		/// <param name="guid">The unique identifier of the plugin. Should not change between plugin versions.</param>
+		/// <param name="name">The user friendly name of the plugin. Is able to be changed between versions.</param>
+		/// <param name="version">The specific version of the plugin.</param>
+		public BepInPlugin(string guid, string name = null, string version = null)
 		{
-			this.GUID = GUID;
-			this.Name = Name;
-			this.Version = TryParseLongVersion(Version);
+			this.GUID = guid;
+			this.Name = name;
+			this.Version = TryParseLongVersion(version);
 		}
 
 		private static SemVer.Version TryParseLongVersion(string version)
@@ -67,7 +68,66 @@ namespace BepInEx
 			if (attr == null)
 				return null;
 
-			return new BepInPlugin((string)attr.ConstructorArguments[0].Value, (string)attr.ConstructorArguments[1].Value, (string)attr.ConstructorArguments[2].Value);
+			var guid = (string)attr.ConstructorArguments[0].Value;
+			var name = (string)attr.ConstructorArguments[1].Value;
+			var version = (string)attr.ConstructorArguments[2].Value;
+
+			var assembly = td.Module.Assembly;
+
+			if (name == null)
+			{
+				name = assembly.Name.Name;
+
+				var nameAttribute = assembly.GetCustomAttribute(typeof(AssemblyTitleAttribute).FullName);
+				if (nameAttribute != null && nameAttribute.ConstructorArguments.Count == 1)
+				{
+					name = (string)nameAttribute.ConstructorArguments.Single().Value;
+				}
+			}
+
+			if (version == null)
+			{
+				version = assembly.Name.Version.ToString();
+
+				var versionAttribute = assembly.GetCustomAttribute(typeof(AssemblyInformationalVersionAttribute).FullName);
+				if (versionAttribute != null && versionAttribute.ConstructorArguments.Count == 1)
+				{
+					version = (string)versionAttribute.ConstructorArguments.Single().Value;
+				}
+			}
+
+			return new BepInPlugin(guid, name, version);
+		}
+
+		internal void Update(Type pluginType)
+		{
+			var assembly = pluginType.Assembly;
+
+			if (Name == null)
+			{
+				Name = assembly.GetName().Name;
+
+				var nameAttribute = MetadataHelper.GetAttributes<AssemblyTitleAttribute>(assembly).Single();
+				if (nameAttribute != null)
+				{
+					Name = nameAttribute.Title;
+				}
+			}
+
+			if (Version == null)
+			{
+				var version = assembly.GetName().Version;
+				Version = new SemVer.Version(version.Major, version.Minor, version.Build != -1 ? version.Build : 0);
+
+				var versionAttribute = MetadataHelper.GetAttributes<AssemblyInformationalVersionAttribute>(assembly).Single();
+				if (versionAttribute != null)
+				{
+					if (SemVer.Version.TryParse(versionAttribute.InformationalVersion, out var v))
+					{
+						Version = v;
+					}
+				}
+			}
 		}
 	}
 
@@ -264,7 +324,10 @@ namespace BepInEx
 			if (attributes.Length == 0)
 				return null;
 
-			return (BepInPlugin)attributes[0];
+			var attribute = (BepInPlugin)attributes[0];
+			attribute.Update(pluginType);
+
+			return attribute;
 		}
 
 		/// <summary>
