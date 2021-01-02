@@ -41,9 +41,6 @@ Task("PullDependencies")
 {
     Information("Updating git submodules");
     StartProcess("git", "submodule update --init --recursive");
-
-    Information("Restoring NuGet packages");
-    NuGetRestore("./BepInEx.sln");
 });
 
 Task("Build")
@@ -55,14 +52,13 @@ Task("Build")
 
     buildVersion = FindRegexMatchGroupInFile(bepinExProperties + File("BepInEx.Shared.projitems"), @"\<Version\>([0-9]+\.[0-9]+\.[0-9]+)-reactor\<\/Version\>", 1, System.Text.RegularExpressions.RegexOptions.None).Value;
 
-    var buildSettings = new MSBuildSettings {
+    var buildSettings = new DotNetCoreBuildSettings {
         Configuration = "Release",
-        Restore = true
     };
 
     if (isBleedingEdge) 
     {
-        buildSettings.Properties["BuildInfo"] = new[] {
+        buildSettings.MSBuildSettings.Properties["BuildInfo"] = new[] {
             TransformText("BLEEDING EDGE Build #<%buildNumber%> from <%shortCommit%> at <%branchName%>")
                 .WithToken("buildNumber", buildId)
                 .WithToken("shortCommit", currentCommit)
@@ -70,7 +66,7 @@ Task("Build")
                 .ToString()
         };
 
-        buildSettings.Properties["AssemblyVersion"] = new[] { buildVersion + "." + buildId };
+        buildSettings.MSBuildSettings.Properties["AssemblyVersion"] = new[] { buildVersion + "." + buildId };
 
         buildVersion += "-reactor." + buildId;
 
@@ -81,14 +77,9 @@ Task("Build")
         buildVersion += "-reactor";
     }
 
-    //buildSettings.Properties["TargetFrameworks"] = new []{ "net35" };
-    MSBuild("./BepInEx.Unity/BepInEx.Unity.csproj", buildSettings);
-    
-    //buildSettings.Properties["TargetFrameworks"] = new []{ "net452" };
-    MSBuild("./BepInEx.NetLauncher/BepInEx.NetLauncher.csproj", buildSettings);
-    
-    //buildSettings.Properties["TargetFrameworks"] = new []{ "net472" };
-    MSBuild("./BepInEx.IL2CPP/BepInEx.IL2CPP.csproj", buildSettings);
+    DotNetCoreBuild("./BepInEx.Unity/BepInEx.Unity.csproj", buildSettings);
+    DotNetCoreBuild("./BepInEx.NetLauncher/BepInEx.NetLauncher.csproj", buildSettings);
+    DotNetCoreBuild("./BepInEx.IL2CPP/BepInEx.IL2CPP.csproj", buildSettings);
 });
 
 const string DOORSTOP_VER_WIN = "3.1.0.0";
