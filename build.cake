@@ -70,7 +70,7 @@ Task("Build")
 
         buildVersion += "-reactor." + buildId;
 
-        buildSettings.Properties["Version"] = new[] { buildVersion };
+        buildSettings.MSBuildSettings.Properties["Version"] = new[] { buildVersion };
     } 
     else 
     {

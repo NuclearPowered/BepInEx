@@ -2,9 +2,7 @@ name: Cake
 
 on:
   push:
-    branches: [ reactor ]
   pull_request:
-    branches: [ reactor ]
 
 jobs:
   build:
