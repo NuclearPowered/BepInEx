@@ -21,9 +21,9 @@ namespace BepInEx.Configuration
 		/// <summary>
 		/// All config entries inside 
 		/// </summary>
-		protected Dictionary<ConfigDefinition, ConfigEntryBase> Entries { get; } = new Dictionary<ConfigDefinition, ConfigEntryBase>();
+		protected Dictionary<ConfigDefinition, ConfigEntryBase> Entries { get; } = new();
 
-		private Dictionary<ConfigDefinition, string> OrphanedEntries { get; } = new Dictionary<ConfigDefinition, string>();
+		private Dictionary<ConfigDefinition, string> OrphanedEntries { get; } = new();
 
 		/// <summary>
 		/// Create a list with all config entries inside of this config file.
@@ -92,7 +92,12 @@ namespace BepInEx.Configuration
 
 		#region Save/Load
 
-		private readonly object _ioLock = new object();
+		private readonly object _ioLock = new();
+		
+		/// <summary>
+		/// Generate user-readable comments for each of the settings in the saved .cfg file.
+		/// </summary>
+		public bool GenerateSettingDescriptions { get; set; } = true;
 
 		/// <summary>
 		/// Reloads the config from disk. Unsaved changes are lost.
@@ -168,9 +173,11 @@ namespace BepInEx.Configuration
 
 						foreach (var configEntry in sectionKv)
 						{
-							writer.WriteLine();
-
-							configEntry.entry?.WriteDescription(writer);
+							if(GenerateSettingDescriptions)
+							{
+								writer.WriteLine();
+								configEntry.entry?.WriteDescription(writer);
+							}
 
 							writer.WriteLine($"{configEntry.Key.Key} = {configEntry.value}");
 						}
