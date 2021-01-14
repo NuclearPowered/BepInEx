@@ -190,7 +190,7 @@ Task("MakeDist")
             if (copyMono)
             {
                 CopyDirectory("./bin/doorstop/mono/" + arch + "/mono", Directory(distArchDir) + Directory("mono"));
-                CopyDirectory("./bin/doorstop/BaseLibs", Directory(distArchDir) + Directory("BepInEx") + Directory("unhollowed") + Directory("base"));
+                CopyDirectory("./bin/doorstop/BaseLibs", Directory(distArchDir) + Directory("BepInEx") + Directory("unity-libs"));
             }
         }
 
