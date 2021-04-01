@@ -1,8 +1,8 @@
-#addin nuget:?package=Cake.FileHelpers&version=3.3.0
-#addin nuget:?package=SharpZipLib&version=1.3.0
-#addin nuget:?package=Cake.Compression&version=0.2.4
-#addin nuget:?package=Cake.Json&version=5.2.0
-#addin nuget:?package=Newtonsoft.Json&version=12.0.3
+#addin nuget:?package=Cake.FileHelpers&version=4.0.1
+#addin nuget:?package=SharpZipLib&version=1.3.1
+#addin nuget:?package=Cake.Compression&version=0.2.6
+#addin nuget:?package=Cake.Json&version=6.0.1
+#addin nuget:?package=Newtonsoft.Json&version=13.0.1
 
 var target = Argument("target", "Pack");
 var buildId = Argument("build_id", EnvironmentVariable("GITHUB_RUN_NUMBER", 0));
@@ -83,9 +83,9 @@ Task("Build")
     DotNetCoreBuild("./BepInEx.IL2CPP/BepInEx.IL2CPP.csproj", buildSettings);
 });
 
-const string DOORSTOP_VER_WIN = "3.1.0.0";
-const string DOORSTOP_VER_UNIX = "1.3.0.0";
-const string MONO_VER = "2020.12.31";
+const string DOORSTOP_VER_WIN = "3.3.1.0";
+const string DOORSTOP_VER_UNIX = "1.5.0.0";
+const string MONO_VER = "2020.1.26";
 const string DOORSTOP_DLL = "winhttp.dll";
 Task("DownloadDependencies")
     .Does(() =>
@@ -202,7 +202,7 @@ Task("MakeDist")
         if (platform == "NetLauncher")
         {
             DeleteFile(Directory(bepinDir) + Directory("core") + File("BepInEx.NetLauncher.exe.config"));
-            MoveFiles(Directory(bepinDir) + Directory("core") + File("BepInEx.NetLauncher.*"), Directory(distArchDir));
+            MoveFiles((string)(Directory(bepinDir) + Directory("core") + File("BepInEx.NetLauncher.*")), Directory(distArchDir));
         }
     }
 
@@ -249,7 +249,7 @@ Task("Pack")
                 ["date"] = DateTime.Now.ToString("o"),
                 ["changelog"] = changelog,
                 ["hash"] = currentCommit,
-				["short_hash"] = currentCommitShort,
+                ["short_hash"] = currentCommitShort,
                 ["artifacts"] = new Dictionary<string, object>[] {
                     new Dictionary<string, object> {
                         ["file"] = $"BepInEx_UnityMono_x64{commitPrefix}{buildVersion}.zip",
@@ -260,7 +260,7 @@ Task("Pack")
                         ["description"] = "BepInEx Unity Mono for Windows x86 machines"
                     },
                     new Dictionary<string, object> {
-                        ["file"] = $"BepInEx_unix{commitPrefix}{buildVersion}.zip",
+                        ["file"] = $"BepInEx_UnityMono_unix{commitPrefix}{buildVersion}.zip",
                         ["description"] = "BepInEx Unity Mono for Unix machines with GCC (Linux, MacOS)"
                     },
                     new Dictionary<string, object> {

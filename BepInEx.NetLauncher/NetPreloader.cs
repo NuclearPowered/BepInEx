@@ -1,100 +1,119 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using BepInEx.Bootstrap;
 using BepInEx.Configuration;
 using BepInEx.Logging;
 using BepInEx.NetLauncher.RuntimeFixes;
 using BepInEx.Preloader.Core;
 using BepInEx.Preloader.Core.Logging;
+using MonoMod.Utils;
 
 namespace BepInEx.NetLauncher
 {
-	public static class NetPreloader
-	{
-		private static readonly ManualLogSource Log = PreloaderLogger.Log;
+    public static class NetPreloader
+    {
+        private static readonly ManualLogSource Log = PreloaderLogger.Log;
+
+        [DllImport("Kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        private static extern bool SetDllDirectory(string lpPathName);
+
+        [DllImport("Kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        private static extern bool AddDllDirectory(string lpPathName);
 
 
-		public static void Start(string[] args)
-		{
-			if (string.IsNullOrEmpty(ConfigEntrypointExecutable.Value))
-			{
-				Log.LogFatal($"Entry executable was not set. Please set this in your config before launching the application");
-				Program.ReadExit();
-				return;
-			}
+        public static void Start(string[] args)
+        {
+            if (string.IsNullOrEmpty(ConfigEntrypointExecutable.Value))
+            {
+                Log.LogFatal($"Entry executable was not set. Please set this in your config before launching the application");
+                Program.ReadExit();
+                return;
+            }
 
-			string executablePath = Path.GetFullPath(ConfigEntrypointExecutable.Value);
+            var executablePath = Path.GetFullPath(ConfigEntrypointExecutable.Value);
 
-			if (!File.Exists(executablePath))
-			{
-				Log.LogFatal($"Unable to locate executable: {ConfigEntrypointExecutable.Value}");
-				Program.ReadExit();
-				return;
-			}
-
-			Paths.SetExecutablePath(executablePath);
-			Program.ResolveDirectories.Add(Paths.GameRootPath);
-			TypeLoader.SearchDirectories.Add(Paths.GameRootPath);
-
-			Logger.Sources.Add(TraceLogSource.CreateSource());
-
-			ChainloaderLogHelper.PrintLogInfo(Log);
-
-			Log.LogInfo($"CLR runtime version: {Environment.Version}");
-
-			Log.LogMessage("Preloader started");
-
-			Assembly entrypointAssembly;
-
-			using (var assemblyPatcher = new AssemblyPatcher())
-			{
-				assemblyPatcher.AddPatchersFromDirectory(Paths.PatcherPluginPath);
-
-				Log.LogInfo($"{assemblyPatcher.PatcherPlugins.Count} patcher plugin(s) loaded");
-
-				assemblyPatcher.LoadAssemblyDirectory(Paths.GameRootPath, "dll", "exe");
-
-				Log.LogInfo($"{assemblyPatcher.AssembliesToPatch.Count} assemblies discovered");
-
-				assemblyPatcher.PatchAndLoad();
+            if (!File.Exists(executablePath))
+            {
+                Log.LogFatal($"Unable to locate executable: {ConfigEntrypointExecutable.Value}");
+                Program.ReadExit();
+                return;
+            }
 
 
-				var assemblyName = AssemblyName.GetAssemblyName(executablePath);
+            Paths.SetExecutablePath(executablePath);
+            Program.ResolveDirectories.Add(Paths.GameRootPath);
 
-				entrypointAssembly = assemblyPatcher.LoadedAssemblies.Values.FirstOrDefault(x => x.FullName == assemblyName.FullName);
+            foreach (var searchDir in Program.ResolveDirectories)
+                TypeLoader.SearchDirectories.Add(searchDir);
 
-				if (entrypointAssembly != null)
-				{
-					Log.LogDebug("Found patched entrypoint assembly! Using it");
-				}
-				else
-				{
-					Log.LogDebug("Using entrypoint assembly from disk");
-					entrypointAssembly = Assembly.LoadFrom(executablePath);
-				}
-			}
-
-			Log.LogMessage("Preloader finished");
-
-			var chainloader = new NetChainloader();
-			chainloader.Initialize();
-			chainloader.Execute();
+            if (PlatformHelper.Is(Platform.Windows))
+            {
+                AddDllDirectory(Paths.GameRootPath);
+                SetDllDirectory(Paths.GameRootPath);
+            }
 
 
-			AssemblyFix.Execute(entrypointAssembly);
+            Logger.Sources.Add(TraceLogSource.CreateSource());
 
-			entrypointAssembly.EntryPoint.Invoke(null, new [] { args });
-		}
+            ChainloaderLogHelper.PrintLogInfo(Log);
 
-		#region Config
+            Log.LogInfo($"CLR runtime version: {Environment.Version}");
 
-		private static readonly ConfigEntry<string> ConfigEntrypointExecutable = ConfigFile.CoreConfig.Bind<string>(
-			"Preloader.Entrypoint", "Assembly",
-			null,
-			"The local filename of the .NET executable to target.");
+            Log.LogMessage("Preloader started");
 
-		#endregion
-	}
+            Assembly entrypointAssembly;
+
+            using (var assemblyPatcher = new AssemblyPatcher())
+            {
+                assemblyPatcher.AddPatchersFromDirectory(Paths.PatcherPluginPath);
+
+                Log.LogInfo($"{assemblyPatcher.PatcherPlugins.Count} patcher plugin(s) loaded");
+
+                assemblyPatcher.LoadAssemblyDirectory(Paths.GameRootPath, "dll", "exe");
+
+                Log.LogInfo($"{assemblyPatcher.AssembliesToPatch.Count} assemblies discovered");
+
+                assemblyPatcher.PatchAndLoad();
+
+
+                var assemblyName = AssemblyName.GetAssemblyName(executablePath);
+
+                entrypointAssembly =
+                    assemblyPatcher.LoadedAssemblies.Values.FirstOrDefault(x => x.FullName == assemblyName.FullName);
+
+                if (entrypointAssembly != null)
+                {
+                    Log.LogDebug("Found patched entrypoint assembly! Using it");
+                }
+                else
+                {
+                    Log.LogDebug("Using entrypoint assembly from disk");
+                    entrypointAssembly = Assembly.LoadFrom(executablePath);
+                }
+            }
+
+            Log.LogMessage("Preloader finished");
+
+            var chainloader = new NetChainloader();
+            chainloader.Initialize();
+            chainloader.Execute();
+
+
+            AssemblyFix.Execute(entrypointAssembly);
+
+            entrypointAssembly.EntryPoint.Invoke(null, new[] { args });
+        }
+
+        #region Config
+
+        private static readonly ConfigEntry<string> ConfigEntrypointExecutable = ConfigFile.CoreConfig.Bind<string>(
+         "Preloader.Entrypoint", "Assembly",
+         null,
+         "The local filename of the .NET executable to target.");
+
+        #endregion
+    }
 }
