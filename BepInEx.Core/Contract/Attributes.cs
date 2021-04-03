@@ -19,14 +19,14 @@ namespace BepInEx
     [AttributeUsage(AttributeTargets.Class)]
     public class BepInPlugin : Attribute
     {
-        /// <param name="GUID">The unique identifier of the plugin. Should not change between plugin versions.</param>
-        /// <param name="Name">The user friendly name of the plugin. Is able to be changed between versions.</param>
-        /// <param name="Version">The specific version of the plugin.</param>
-        public BepInPlugin(string GUID, string Name, string Version)
+        /// <param name="guid">The unique identifier of the plugin. Should not change between plugin versions.</param>
+        /// <param name="name">The user friendly name of the plugin. Is able to be changed between versions.</param>
+        /// <param name="version">The specific version of the plugin.</param>
+        public BepInPlugin(string guid, string name = null, string version = null)
         {
-            this.GUID = GUID;
-            this.Name = Name;
-            this.Version = TryParseLongVersion(Version);
+            this.GUID = guid;
+            this.Name = name;
+            this.Version = TryParseLongVersion(version);
         }
 
         /// <summary>
