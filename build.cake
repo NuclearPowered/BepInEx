@@ -4,9 +4,9 @@
 #addin nuget:?package=Cake.Json&version=6.0.1
 #addin nuget:?package=Newtonsoft.Json&version=13.0.1
 
-var target = Argument("target", "Build");
-var isBleedingEdge = Argument("bleeding_edge", false);
-var buildId = Argument("build_id", 0);
+var target = Argument("target", "Pack");
+var buildId = Argument("build_id", EnvironmentVariable("GITHUB_RUN_NUMBER", 0));
+var isBleedingEdge = Argument("bleeding_edge", buildId != 0);
 var lastBuildCommit = Argument("last_build_commit", "");
 
 var buildVersion = "";
@@ -50,7 +50,7 @@ Task("Build")
 {
     var bepinExProperties = Directory("./BepInEx.Shared");
 
-    buildVersion = FindRegexMatchGroupInFile(bepinExProperties + File("BepInEx.Shared.projitems"), @"\<Version\>([0-9]+\.[0-9]+\.[0-9]+)\<\/Version\>", 1, System.Text.RegularExpressions.RegexOptions.None).Value;
+    buildVersion = FindRegexMatchGroupInFile(bepinExProperties + File("BepInEx.Shared.projitems"), @"\<Version\>([0-9]+\.[0-9]+\.[0-9]+)-reactor\<\/Version\>", 1, System.Text.RegularExpressions.RegexOptions.None).Value;
 
     var buildSettings = new DotNetCoreBuildSettings {
         Configuration = "Release",
@@ -69,9 +69,13 @@ Task("Build")
 
         buildSettings.MSBuildSettings.Properties["AssemblyVersion"] = new[] { buildVersion + "." + buildId };
 
-        buildVersion += "-be." + buildId;
+        buildVersion += "-reactor." + buildId;
 
         buildSettings.MSBuildSettings.Properties["Version"] = new[] { buildVersion };
+    } 
+    else 
+    {
+        buildVersion += "-reactor";
     }
 
     DotNetCoreBuild("./BepInEx.Unity/BepInEx.Unity.csproj", buildSettings);
@@ -188,7 +192,7 @@ Task("MakeDist")
         CopyFiles("./bin/" + Directory(originDir) + "/*.*", Directory(bepinDir) + Directory("core"));
 
 
-        FileWriteText(distArchDir + File("changelog.txt"), changelog);
+//         FileWriteText(distArchDir + File("changelog.txt"), changelog);
 
         if (platform == "NetLauncher")
         {
